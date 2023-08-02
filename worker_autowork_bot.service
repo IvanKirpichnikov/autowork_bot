@@ -1,0 +1,14 @@
+[Unit]
+Description=TaskIq worker for autowork bot
+Requires=redis.service
+Requires=postgresql.service
+
+[Service]
+User=root
+Type=simple
+WorkingDirectory=/root/autowork_bot/
+ExecStart=bash -c "venv/bin/python -m taskiq worker src.infrastructure.worker.broker:broker src.infrastructure.worker.on_event src.infrastructure.worker.tasks src.infrastructure.worker.cron --worker 1"
+Restart=always
+
+[Install]
+WantedBy=installer.target
