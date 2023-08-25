@@ -1,0 +1,13 @@
+[Unit]
+Description=TaskIq schduler autowork bot
+Requires=redis.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/autowork_bot/
+ExecStart=bash -c "/root/autowork_bot/venv/bin/python -m taskiq scheduler src.infrastructure.scheduler.broker:scheduler src.infrastructure.scheduler.cron"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
