@@ -1,4 +1,4 @@
-from typing import NewType
+from typing import Dict, NewType, Optional
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardMarkup
@@ -22,6 +22,7 @@ def sign_up(l10n: TranslatorRunner) -> InlineKeyboardMarkup:
     
     return builder.as_markup()
 
+
 def more_and_sign_up(
     l10n: TranslatorRunner,
     video: int,
@@ -41,6 +42,7 @@ def more_and_sign_up(
     
     return builder.adjust(1).as_markup()
 
+
 def get_access(l10n: TranslatorRunner) -> InlineKeyboardMarkup:
     bilder = InlineKeyboardBuilder()
     
@@ -48,6 +50,7 @@ def get_access(l10n: TranslatorRunner) -> InlineKeyboardMarkup:
         text=l10n.sub.to.channel(), url=l10n.channel.url()
     )
     return bilder.as_markup()
+
 
 def pool() -> InlineKeyboardMarkup:
     bilder = InlineKeyboardBuilder()
@@ -57,6 +60,28 @@ def pool() -> InlineKeyboardMarkup:
     )
     for _ in range(2, 4):
         bilder.button(
-            text=str(_), callback_data=f'shcijjd{_-1}'
+            text=str(_), callback_data=f'shcijjd{_ - 1}'
         )
     return bilder.as_markup()
+
+
+def left_button(data) -> Dict[str, str]:
+    return {'text': '⬅️', 'callback_data': f'left:{data}'}
+
+
+def right_button(data) -> Dict[str, str]:
+    return {'text': '➡️', 'callback_data': f'right:{data}'}
+
+
+def keyboard_scroll(
+    back_id: Optional[int],
+    next_id: Optional[int]
+) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    
+    if back_id:
+        builder.button(**left_button(back_id))
+    if next_id:
+        builder.button(**right_button(back_id))
+    
+    return builder.adjust(2).as_markup()

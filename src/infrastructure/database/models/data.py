@@ -8,3 +8,11 @@ class DataModel(BaseModel):
     cid: int
     stage: int
     datetime: datetime
+
+
+class NewDataModel(BaseModel):
+    id: int
+    tid: int
+    cid: int
+    stage: int
+    datetime: datetime

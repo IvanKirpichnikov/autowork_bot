@@ -29,9 +29,6 @@ async def start() -> None:
         db=redis.db
     )
     try:
-        async with pool.acquire() as connect:
-            await creating_tables.creating(connect)
-            await add_stages.add(connect)
         await main.start_bot(pool, redis, config)
     finally:
         await redis.close()
