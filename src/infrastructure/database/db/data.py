@@ -1,10 +1,10 @@
 from datetime import datetime as dt
-from typing import Optional
+from typing import List, Optional
 
 from asyncpg import Connection
 
 from src.infrastructure.database.db.base import BaseDB
-from src.infrastructure.database.models.data import DataModel, NewDataModel
+from src.infrastructure.database.models.data import DataModel, NewDataModel, NewNewDataModel
 from src.infrastructure.database.models.user import UserDataModel
 
 
@@ -15,8 +15,9 @@ class DataDB(BaseDB):
         *,
         tid: int,
         cid: int,
-        stage: str,
-        datetime: dt
+        stage: int,
+        datetime: dt,
+        username: str
     ) -> None:
         async with connect.transaction():
             await connect.execute(
@@ -25,43 +26,30 @@ class DataDB(BaseDB):
                         tid,
                         cid,
                         stage,
-                        datetime
-                    ) VALUES($1,$2,$3,$4)
+                        datetime,
+                        registration,
+                        username
+                    ) VALUES($1,$2,$3,$4, $5::TIMESTAMP(0), $6)
                     ON CONFLICT (tid) DO UPDATE
-                    SET stage = $3, datetime = $4
-                ''', tid, cid, stage, datetime
+                    SET stage = $3, datetime = $4, username = $6
+                ''', tid, cid, stage, datetime, dt.now(), username or "-"
             )
-    async def get_users(
+    async def pagination(
         self,
         connect: Connection,
         *,
         offset: int
-    ) -> Optional[UserDataModel]:
-        async with connect.transaction(readonly=True):
-            cursor = await connect.cursor(
-                '''
-                SELECT LAG(id) OVER(ORDER BY id) AS back_id,
-                       id AS current_id,
-                       LEAD(id) OVER(ORDER BY id) AS next_id
-                  FROM users
-                 LIMIT 1 OFFSET $1;
-                ''', offset
-            )
-            data = await cursor.fetchrow()
-        back_id = data.get('back_id')
-        current_id = data.get('current_id')
-        next_id = data.get('next_id')
+    ) -> List[NewNewDataModel]:
+        data = await connect.fetch('''
+            SELECT id,
+                   username,
+                   stage,
+                   registration
+              FROM users
+              ORDER BY id;
+        ''')
         
-        if (back_id, current_id, next_id) == (None, None, None):
-            return None
-        
-        user = await self.get_data_to_id(connect, id=current_id)
-        
-        return UserDataModel(
-            back_id=back_id,
-            data=NewDataModel(**vars(user)),
-            next_id=next_id
-        )
+        return [NewNewDataModel(**_) for _ in data]
     
     async def delete_data(
         self,
@@ -99,7 +87,7 @@ class DataDB(BaseDB):
         connect: Connection,
         *,
         id: int
-    ) -> DataModel:
+    ) -> NewDataModel:
         async with connect.transaction():
             data = await connect.fetchrow(
                 '''
@@ -107,7 +95,7 @@ class DataDB(BaseDB):
                            tid,
                            cid,
                            stage,
-                           datetime
+                           registration
                     FROM users
                     WHERE id = $1
                 ''', id

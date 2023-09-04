@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery, Message, TelegramObject
 
 
 class TrottlingMiddleware(BaseMiddleware):
-    def __init__(self, rate_limit: float=2.0):
+    def __init__(self, rate_limit: float=0.5):
         self.cache = TTLCache(maxsize=10000, ttl=rate_limit)
     
     async def __call__(

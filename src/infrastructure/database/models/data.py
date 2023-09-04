@@ -15,4 +15,10 @@ class NewDataModel(BaseModel):
     tid: int
     cid: int
     stage: int
-    datetime: datetime
+    registration: datetime
+
+class NewNewDataModel(BaseModel):
+    id: int
+    username: str
+    stage: int
+    registration: datetime

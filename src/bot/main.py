@@ -53,11 +53,11 @@ async def start_bot(
     )
     dp.include_router(router)
     
-    dp.message.outer_middleware(TrottlingMiddleware())
+    # dp.message.outer_middleware(TrottlingMiddleware())
     dp.message.middleware(L10NMiddleware())
     dp.my_chat_member.middleware(L10NMiddleware())
     dp.callback_query.middleware(L10NMiddleware())
-    dp.callback_query.outer_middleware(TrottlingMiddleware())
+    # dp.callback_query.outer_middleware(TrottlingMiddleware())
     dp.chat_member.middleware(L10NMiddleware())
     dp.update.middleware(CreateConnectMiddleware())
     

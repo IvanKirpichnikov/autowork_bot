@@ -10,7 +10,6 @@ from src.infrastructure.worker.broker import broker
 from src.infrastructure.worker.utils import select_task
 
 
-
 @broker.task(schedule=[{"cron": "*/1 * * * *"}])
 async def send_messages(context: Context = TaskiqDepends()) -> None:
     pool: Pool = context.state.pool
@@ -38,7 +37,7 @@ async def send_messages(context: Context = TaskiqDepends()) -> None:
                     tid=data.tid,
                     stage=data.stage,
                     datetime=datetime.now().replace(
-                    microsecond=0, second=0
+                        microsecond=0, second=0
                     ) + timedelta(minutes=1)
                 )
         await sleep(0.1)

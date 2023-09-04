@@ -38,7 +38,8 @@ async def greetting_not_sub_channel(
         stage=3,
         datetime=datetime.now().replace(
             microsecond=0, second=0
-        ) + timedelta(minutes=5)
+        ) + timedelta(minutes=5),
+        username=message.from_user.username
     )
 
 @router.message(CommandStart(), ~CheckStatus())
@@ -62,16 +63,9 @@ async def greetting_sub_channel(
         connect,
         tid=user_id,
         cid=message.chat.id,
-        stage=2,
-        datetime=datetime.now().replace(
-            microsecond=0, second=0
-        ) + timedelta(minutes=1)
-    )
-    await data_db.update_data(
-        connect,
-        tid=user_id,
         stage=4,
         datetime=datetime.now().replace(
             microsecond=0, second=0
-        ) + timedelta(minutes=5)
+        ) + timedelta(minutes=5),
+        username = message.from_user.username
     )
